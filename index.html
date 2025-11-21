@@ -50,6 +50,10 @@
                         <span class="absolute -top-1 -right-1 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">+</span>
                     </div>
                     <i data-lucide="music" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    <div class="relative" id="api-status" title="OpenAI API 상태">
+                        <i data-lucide="key" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                        <span id="api-indicator" class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
+                    </div>
                     <i data-lucide="settings" class="w-[22px] h-[22px] stroke-[1.5]"></i>
                 </div>
             </div>
@@ -149,12 +153,19 @@
     </div>
 
     <script>
+        // OpenAI API 설정 - 여기에 자신의 API 키를 입력하세요
+        const OPENAI_API_KEY = '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'; // 실제 API 키로 교체 필요
+        
         // --- Data ---
         const friends = [
             { id: 1, name: '박팀장 (물류센터)', avatar: 'bg-blue-600', isTeam: true },
             { id: 2, name: '은평구 불광동 (빌라 3층)', avatar: 'bg-gray-200' },
             { id: 3, name: '서대문구 홍제동 (기스무새)', avatar: 'bg-red-200' },
             { id: 4, name: '은평 뉴타운 (설치불가)', avatar: 'bg-yellow-200' },
+            { id: 5, name: '서대문구 연희동 (원룸)', avatar: 'bg-purple-200' },
+            { id: 6, name: '서대문구 천연동 (전문가)', avatar: 'bg-green-200' },
+            { id: 7, name: '은평구 녹번동 (아파트)', avatar: 'bg-indigo-200' },
+            { id: 8, name: '은평구 대조동 (주부)', avatar: 'bg-pink-200' },
         ];
 
         let chatRooms = [
@@ -210,6 +221,54 @@
                     { id: 3, text: '진입이 불가능해서 사다리차 부르셔야 할 것 같아요.', time: '오전 11:36', isMe: true },
                     { id: 4, text: '아니 우리집 문이 좁은게 아니라 그쪽 기술이 없는거 아니에요? 그냥 분해해서 넣어줘요!!', time: '오전 11:45', isMe: false },
                 ]
+            },
+            {
+                id: 5,
+                friendId: 5,
+                lastMessage: '와 진짜 예쁘네요! 바닥에 보양지 다 깔아주시겠어요?',
+                lastTime: '오후 4:20',
+                unreadCount: 2,
+                messages: [
+                    { id: 1, text: '고객님 연희동 원룸 도착했습니다.', time: '오후 4:10', isMe: true },
+                    { id: 2, text: '네 들어오세요! 코드는 2023# 입니다.', time: '오후 4:15', isMe: false },
+                    { id: 3, text: '와 진짜 예쁘네요! 바닥에 보양지 다 깔아주시겠어요?', time: '오후 4:20', isMe: false },
+                ]
+            },
+            {
+                id: 6,
+                friendId: 6,
+                lastMessage: '거실 콘센트 위치 옮겨야겠는데 전공 기자재 가져오셨어요?',
+                lastTime: '오후 5:10',
+                unreadCount: 1,
+                messages: [
+                    { id: 1, text: '고객님 천연동 도착했습니다.', time: '오후 5:00', isMe: true },
+                    { id: 2, text: '저 이번에 LED 설치 같이 할 건데요', time: '오후 5:05', isMe: false },
+                    { id: 3, text: '거실 콘센트 위치 옮겨야겠는데 전공 기자재 가져오셨어요?', time: '오후 5:10', isMe: false },
+                ]
+            },
+            {
+                id: 7,
+                friendId: 7,
+                lastMessage: '할인 좀 해주시면 다음에도 계약할게요',
+                lastTime: '오전 10:30',
+                unreadCount: 2,
+                messages: [
+                    { id: 1, text: '고객님 녹번동 아파트 도착했습니다.', time: '오전 10:20', isMe: true },
+                    { id: 2, text: '여기 에어컨 설치비가 좀 비싸네요', time: '오전 10:25', isMe: false },
+                    { id: 3, text: '할인 좀 해주시면 다음에도 계약할게요', time: '오전 10:30', isMe: false },
+                ]
+            },
+            {
+                id: 8,
+                friendId: 8,
+                lastMessage: '아이들이 방과 후 5시까지는 돌아와요 그 전에 끝낼 수 있을까요?',
+                lastTime: '오전 9:45',
+                unreadCount: 3,
+                messages: [
+                    { id: 1, text: '고객님 대조동 주택 도착했습니다.', time: '오전 9:30', isMe: true },
+                    { id: 2, text: '안녕하세요! 신혼집인데 설치 좀 깔끔하게 부탁드려요', time: '오전 9:35', isMe: false },
+                    { id: 3, text: '아이들이 방과 후 5시까지는 돌아와요 그 전에 끝낼 수 있을까요?', time: '오전 9:45', isMe: false },
+                ]
             }
         ];
 
@@ -229,6 +288,21 @@
         const btnBack = document.getElementById('btn-back');
 
         // --- Functions ---
+
+        // 페르소나별 시스템 프롬프트 정의
+        const getPersonaPrompt = (friendId) => {
+            const prompts = {
+                1: "당신은 박팀장입니다. 삼성전자 설치팀 팀장으로서, 직설적이고 업무 중심적인 말투를 사용합니다. 김기사에게 업무 지시를 내리거나 상황을 보고할 때 간결하고 단호한 어조를 사용하세요. 경어는 최소화하고 업무 효율을 중시하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                2: "당신은 은평구 불광동 빌라 3층에 사는 고객입니다. 항상 집에 없으며 전화로만 소통합니다. 집에 없다는 핑계로 기사님에게 불가능한 요구를 자주 하고, '저번 기사님은 해주던데'라는 말을 자주 사용합니다. 귀찮아하는 태도를 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                3: "당신은 서대문구 홍제동에 사는 고객입니다. 모든 것에 불만을 가지고 있으며 민감한 성격입니다. 작은 흠집이나 문제도 크게 확대 해석하고, 환불을 요구하는 등 강한 불만을 표출합니다. 모든 것이 자신에게 불리하다고 생각하는 성향을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                4: "당신은 은평 뉴타운에 사는 고객입니다. 자기중심적이며 비현실적인 요구를 합니다. 현관이 좁다는 사실을 인정하지 않고, 오히려 기술자의 실력 탓으로 돌리며 '분해해서 넣으라'는 식의 무리한 요구를 합니다. 자신의 주장만 옳다고 생각하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                5: "당신은 서대문구 연희동 원룸에 사는 젊은 커플입니다. 깔끔하고 세련된 것을 중시하며, 예의 바르지만 설치 과정에서도 꼼꼼하게 확인합니다. 보양지나 바닥 보호 등 세심한 부분까지 신경 쓰며, 미학적인 면을 중요시하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                6: "당신은 서대문구 천연동에 사는 전문가 성향의 고객입니다. 설치 과정에 직접 참여하려 하며, 전문 용어를 사용하고 기술적인 질문을 많이 합니다. 기자재나 설치 방식에 대해 자신의 의견을 강하게 주장하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                7: "당신은 은평구 녹번동 낡은 아파트에 사는 고객입니다. 비용에 매우 민감하며 할인을 지속적으로 요구합니다. '다음에도 계약할게요'라는 말을 사용해 추가 할인을 유도하려 하며, 비용 절감을 최우선으로 생각하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요.",
+                8: "당신은 은평구 대조동에 사는 주부입니다. 정중한 말투를 사용하지만 시간에 매우 집착합니다. 아이들의 일정 등 가족 사정을 이유로 정확한 시간 약속을 강요하며, 계속해서 시간 확인을 하는 성격을 보여주세요. 반드시 1-2문장으로 간결하게 답변하세요."
+            };
+            return prompts[friendId] || "당신은 일반적인 고객입니다. 반드시 1-2문장으로 간결하게 답변하세요.";
+        };
 
         // 시간 포맷
         const getCurrentTime = () => new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
@@ -389,29 +463,92 @@
             triggerAutoReply(room.id, room.friendId);
         }
 
-        // 자동 답장 (AI 시뮬레이션)
-        function triggerAutoReply(roomId, friendId) {
-            setTimeout(() => {
-                // 방금 보낸 방이 여전히 존재하는지 확인
-                const room = chatRooms.find(r => r.id === roomId);
-                if (!room) return;
-
-                let replyText = "";
+        // API 키 유효성 확인
+        async function validateApiKey() {
+            if (!checkApiKeyStatus()) {
+                return false;
+            }
+            
+            try {
+                const response = await fetch('https://api.openai.com/v1/models', {
+                    headers: {
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    }
+                });
                 
-                // 페르소나별 대사
-                if (friendId === 1) { // 박팀장
-                    const replies = ["김기사 잡담하지 말고 빨리 이동해", "고객 클레임 들어오면 시말서야 알지?", "다음 집 5시까지 도착 가능해?", "사진 찍어서 전송해.", "오늘 야근 좀 해야겠다 물량 밀렸어"];
-                    replyText = replies[Math.floor(Math.random() * replies.length)];
-                } else if (friendId === 2) { // 불광동
-                    const replies = ["저 지금 밖이라니까요? 그냥 문앞에 두세요 책임질게요", "아니 저번 기사님은 창문 떼고 넣어주던데 왜 안해줘요?", "비번 12344321 이에요 그냥 들어가세요", "저 5분 뒤에 도착해요 기다리세요 (30분째 안옴)", "계단 좁아도 세워서 올리면 되잖아요 전문가 아니에요?"];
-                    replyText = replies[Math.floor(Math.random() * replies.length)];
-                } else if (friendId === 3) { // 홍제동
-                    const replies = ["지금 저 가르치시는 거에요?", "아니 맘카페에 다 올릴거에요 환불해주세요", "눈이 있으면 보세요 이게 기스지 뭡니까?", "기분 나빠서 못쓰겠으니까 다시 가져가요", "팀장 바꾸세요 당장."];
-                    replyText = replies[Math.floor(Math.random() * replies.length)];
-                } else if (friendId === 4) { // 은평뉴타운
-                    const replies = ["들어간다니까요?? 우리집 넓어요!", "문짝 떼고 넣으면 들어가잖아요 아 답답하네", "창틀 뜯어주세요 제가 책임질게요", "아니 멀쩡한 세탁기를 왜 못넣는다는 거에요?", "다른 기사님 보내주세요 기술 없으시네"];
-                    replyText = replies[Math.floor(Math.random() * replies.length)];
+                return response.ok;
+            } catch (error) {
+                console.error('API 키 확인 중 오류:', error);
+                return false;
+            }
+        }
+
+        // OpenAI API를 사용한 AI 답장
+        async function triggerAutoReply(roomId, friendId) {
+            const room = chatRooms.find(r => r.id === roomId);
+            if (!room) return;
+
+            // API 키 확인
+            if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your-openai-api-key-here') {
+                showErrorMessage("OpenAI API 키가 설정되지 않았습니다. 코드 상단의 OPENAI_API_KEY 변수에 키를 입력하세요.");
+                return;
+            }
+
+            // API 키 유효성 확인 (비동기)
+            const isValidKey = await validateApiKey();
+            if (!isValidKey) {
+                showErrorMessage("API 키가 유효하지 않습니다. OpenAI 대시보드에서 키를 확인하고 다시 시도해주세요.");
+                return;
+            }
+
+            // 타이핑 중 표시
+            showTypingIndicator(roomId);
+
+            try {
+                // 최근 메시지 기록 가져오기 (최대 10개)
+                const recentMessages = room.messages.slice(-10);
+                
+                // 대화 컨텍스트 구성
+                const messages = [
+                    { role: "system", content: getPersonaPrompt(friendId) },
+                    ...recentMessages.map(msg => ({
+                        role: msg.isMe ? "user" : "assistant",
+                        content: msg.text
+                    }))
+                ];
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-5-mini',
+                        messages: messages
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMessage = `API 요청 실패: ${response.status}`;
+                    
+                    if (response.status === 401) {
+                        errorMessage = 'API 키가 유효하지 않거나 만료되었습니다. 키를 확인해주세요.';
+                    } else if (response.status === 429) {
+                        errorMessage = 'API 요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
+                    } else if (errorData.error && errorData.error.message) {
+                        errorMessage = `API 오류: ${errorData.error.message}`;
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
+
+                const data = await response.json();
+                const replyText = data.choices[0].message.content.trim();
+                
+                // 타이핑 표시 제거
+                hideTypingIndicator(roomId);
 
                 const replyTime = getCurrentTime();
                 room.messages.push({ id: Date.now(), text: replyText, time: replyTime, isMe: false });
@@ -427,7 +564,54 @@
                 
                 renderChatList();
 
-            }, 1500 + Math.random() * 2000); // 1.5 ~ 3.5초 딜레이
+            } catch (error) {
+                hideTypingIndicator(roomId);
+                console.error('OpenAI API 호출 중 오류:', error);
+                showErrorMessage("AI 응답 생성 중 오류가 발생했습니다: " + error.message);
+            }
+        }
+
+        // 타이핑 표시 함수
+        function showTypingIndicator(roomId) {
+            const room = chatRooms.find(r => r.id === roomId);
+            if (!room || activeChatId !== roomId) return;
+            
+            const typingEl = document.createElement('div');
+            typingEl.id = 'typing-indicator';
+            typingEl.className = 'flex w-full mb-2 justify-start';
+            typingEl.innerHTML = `
+                <div class="w-[38px] h-[38px] rounded-[14px] mr-2 flex-shrink-0"></div>
+                <div class="flex flex-col max-w-[70%] items-start">
+                    <div class="relative px-3 py-2 text-[14px] leading-relaxed break-all shadow-sm bg-white text-black rounded-r-xl rounded-bl-sm rounded-tl-xl">
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messageArea.appendChild(typingEl);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator(roomId) {
+            const typingEl = document.getElementById('typing-indicator');
+            if (typingEl) {
+                typingEl.remove();
+            }
+        }
+
+        // 에러 메시지 표시 함수
+        function showErrorMessage(message) {
+            const errorEl = document.createElement('div');
+            errorEl.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            errorEl.textContent = message;
+            document.body.appendChild(errorEl);
+            
+            setTimeout(() => {
+                errorEl.remove();
+            }, 5000);
         }
 
         // --- Event Listeners ---
@@ -459,9 +643,31 @@
             }
         }
 
+        // API 키 상태 확인
+        function checkApiKeyStatus() {
+            const apiIndicator = document.getElementById('api-indicator');
+            if (OPENAI_API_KEY && OPENAI_API_KEY !== 'your-openai-api-key-here') {
+                // API 키가 sk-로 시작하는지 확인
+                if (OPENAI_API_KEY.startsWith('sk-')) {
+                    apiIndicator.classList.remove('bg-red-500', 'bg-yellow-500');
+                    apiIndicator.classList.add('bg-green-500');
+                    return true;
+                } else {
+                    apiIndicator.classList.remove('bg-green-500', 'bg-red-500');
+                    apiIndicator.classList.add('bg-yellow-500');
+                    return false;
+                }
+            } else {
+                apiIndicator.classList.remove('bg-green-500', 'bg-yellow-500');
+                apiIndicator.classList.add('bg-red-500');
+                return false;
+            }
+        }
+
         // --- Initialization ---
         lucide.createIcons();
         renderChatList();
+        checkApiKeyStatus();
 
     </script>
 </body>
