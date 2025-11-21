@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KakaoTalk Clone - Samsung Installer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 스크롤바 숨기기 (Chrome, Safari, Opera) */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* 스크롤바 숨기기 (IE, Edge, Firefox) */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen font-sans">
+
+    <!-- Phone Frame -->
+    <div class="w-full h-full sm:w-[375px] sm:h-[812px] bg-white sm:rounded-[30px] sm:shadow-2xl overflow-hidden flex flex-col relative border-gray-200 sm:border relative">
+        
+        <!-- Status Bar -->
+        <div class="h-7 bg-white flex justify-between items-center px-5 text-xs font-medium z-20 select-none flex-shrink-0">
+            <span>14:30</span>
+            <div class="flex gap-1">
+                <span>5G</span>
+                <span>88%</span>
+            </div>
+        </div>
+
+        <!-- VIEW: Chat List -->
+        <div id="view-list" class="flex flex-col h-full bg-white absolute inset-0 pt-7">
+            <!-- Header -->
+            <div class="h-14 px-5 flex justify-between items-center bg-white flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-bold text-black">채팅</h1>
+                    <span class="text-xl font-bold text-gray-400">오픈채팅</span>
+                </div>
+                <div class="flex gap-4 text-black items-center">
+                    <i data-lucide="search" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    <div class="relative">
+                        <i data-lucide="message-circle" class="w-[22px] h-[22px] stroke-[1.5] mt-0.5"></i>
+                        <span class="absolute -top-1 -right-1 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">+</span>
+                    </div>
+                    <i data-lucide="music" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    <i data-lucide="settings" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                </div>
+            </div>
+
+            <!-- Ad Banner -->
+            <div class="mx-4 mb-2 p-3 bg-gray-50 rounded-lg flex items-center gap-3 text-xs text-gray-500 border border-gray-100 flex-shrink-0">
+                <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center text-blue-600 font-bold">S</div>
+                <div class="flex-1">
+                    <p class="font-bold text-gray-800">삼성전자 로지텍</p>
+                    <p>이번 달 우수 설치 기사 시상 안내</p>
+                </div>
+            </div>
+
+            <!-- List Container -->
+            <div id="chat-list-container" class="flex-1 overflow-y-auto no-scrollbar pb-[60px]">
+                <!-- Chat items will be injected here via JS -->
+            </div>
+
+            <!-- Bottom Tab Bar -->
+            <div class="h-[60px] bg-[#F9F9F9] border-t border-gray-200 flex justify-between items-center px-6 pb-2 absolute bottom-0 w-full">
+                <button class="flex flex-col items-center justify-center w-12 h-full text-gray-400 group">
+                    <i data-lucide="user" class="w-[26px] h-[26px] stroke-[1.5]"></i>
+                </button>
+                <button class="flex flex-col items-center justify-center w-12 h-full text-black group relative">
+                    <i data-lucide="message-circle" class="w-[26px] h-[26px] stroke-[2.5] fill-current"></i>
+                    <span id="total-badge" class="absolute top-0 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] hidden">0</span>
+                </button>
+                <button class="flex flex-col items-center justify-center w-12 h-full text-gray-400 group">
+                    <i data-lucide="eye" class="w-[26px] h-[26px] stroke-[1.5]"></i>
+                </button>
+                <button class="flex flex-col items-center justify-center w-12 h-full text-gray-400 group">
+                    <i data-lucide="shopping-bag" class="w-[26px] h-[26px] stroke-[1.5]"></i>
+                </button>
+                <button class="flex flex-col items-center justify-center w-12 h-full text-gray-400 group">
+                    <i data-lucide="more-horizontal" class="w-[26px] h-[26px] stroke-[1.5]"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW: Chat Room (Initially Hidden) -->
+        <div id="view-room" class="flex flex-col h-full bg-[#ABC1D1] absolute inset-0 z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+            <!-- Header -->
+            <div class="h-[50px] bg-[#ABC1D1]/90 backdrop-blur-sm px-3 flex justify-between items-center z-10 flex-shrink-0 pt-7 sm:pt-0">
+                <button id="btn-back" class="flex items-center gap-2 cursor-pointer p-2">
+                    <i data-lucide="chevron-left" class="w-[28px] h-[28px] text-gray-800 stroke-[1.5]"></i>
+                </button>
+                <div class="flex flex-col items-center">
+                    <h2 id="room-title" class="text-[15px] font-bold text-gray-800">이름</h2>
+                </div>
+                <div class="flex items-center gap-4 text-gray-800 p-2">
+                    <i data-lucide="search" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    <i data-lucide="menu" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                </div>
+            </div>
+
+            <!-- Message Area -->
+            <div id="message-area" class="flex-1 overflow-y-auto p-4 no-scrollbar">
+                <div class="flex justify-center mb-4">
+                    <div class="bg-[#9CACBF] text-white text-[10px] px-2 py-1 rounded-full bg-opacity-40">
+                        2025년 5월 24일 금요일
+                    </div>
+                </div>
+                <!-- Messages will be injected here -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-white px-3 pb-3 pt-2 flex-shrink-0">
+                <form id="chat-form" class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between w-full h-full">
+                         <div class="p-2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors">
+                            <i data-lucide="plus" class="w-[24px] h-[24px] stroke-[1.5]"></i>
+                         </div>
+                         <div class="flex-1 bg-[#F5F5F5] rounded-[20px] flex items-center px-4 py-2 mx-1 focus-within:bg-[#EBEBEB] transition-colors">
+                            <input
+                                id="message-input"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="메시지 입력 (예: 고객님 진정하세요)"
+                                class="bg-transparent border-none outline-none text-sm w-full placeholder-gray-400 text-gray-900"
+                            />
+                            <button type="button" class="text-gray-400 ml-2 hover:text-black">
+                                <i data-lucide="smile" class="w-[20px] h-[20px] stroke-[1.5]"></i>
+                            </button>
+                        </div>
+                         <button 
+                            id="btn-send"
+                            type="submit" 
+                            class="p-2 rounded-full bg-gray-100 text-gray-400 transition-all duration-200"
+                         >
+                            <i data-lucide="send" class="w-[20px] h-[20px] stroke-[1.5]"></i>
+                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data ---
+        const friends = [
+            { id: 1, name: '박팀장 (물류센터)', avatar: 'bg-blue-600', isTeam: true },
+            { id: 2, name: '은평구 불광동 (빌라 3층)', avatar: 'bg-gray-200' },
+            { id: 3, name: '서대문구 홍제동 (기스무새)', avatar: 'bg-red-200' },
+            { id: 4, name: '은평 뉴타운 (설치불가)', avatar: 'bg-yellow-200' },
+        ];
+
+        let chatRooms = [
+            {
+                id: 1,
+                friendId: 1,
+                lastMessage: '홍제동 끝나면 불광동으로 바로 넘어가.',
+                lastTime: '오후 1:15',
+                unreadCount: 1,
+                messages: [
+                    { id: 1, text: '오늘 은평구 물량 터졌으니까 서둘러.', time: '오전 07:30', isMe: false },
+                    { id: 2, text: '네 알겠습니다. 지금 연신내 쪽 지나고 있습니다.', time: '오전 07:32', isMe: true },
+                    { id: 3, text: '홍제동 끝나면 불광동으로 바로 넘어가. 고객님 기다리셔.', time: '오후 1:15', isMe: false },
+                ]
+            },
+            {
+                id: 2,
+                friendId: 2,
+                lastMessage: '빌라 3층인데 엘베 없어도 그냥 올려주세요',
+                lastTime: '오후 2:10',
+                unreadCount: 3,
+                messages: [
+                    { id: 1, text: '고객님 삼성전자입니다. 불광동 빌라 도착 예정입니다.', time: '오후 1:50', isMe: true },
+                    { id: 2, text: '제가 지금 회사라서요', time: '오후 2:00', isMe: false },
+                    { id: 3, text: '비번 알려드릴테니 문 앞에 놔주세요', time: '오후 2:01', isMe: false },
+                    { id: 4, text: '고객님 이거 4도어 냉장고라 현관 진입이 안됩니다 ㅠㅠ 계셔야 해요.', time: '오후 2:02', isMe: true },
+                    { id: 5, text: '빌라 3층인데 엘베 없어도 그냥 올려주세요. 저번엔 해주던데?', time: '오후 2:10', isMe: false },
+                ]
+            },
+            {
+                id: 3,
+                friendId: 3,
+                lastMessage: '사진 확대해보세요 이거 기스 맞죠??',
+                lastTime: '방금',
+                unreadCount: 5,
+                messages: [
+                    { id: 1, text: '기사님 잠깐만요', time: '오후 3:00', isMe: false },
+                    { id: 2, text: '여기 냉장고 옆면에 뭐 묻어있는데요?', time: '오후 3:01', isMe: false },
+                    { id: 3, text: '고객님 그건 먼지입니다. 닦으면 지워집니다.', time: '오후 3:02', isMe: true },
+                    { id: 4, text: '아니 새 제품을 샀는데 먼지가 왜 묻어와요? 기분 나빠서 못쓰겠네', time: '오후 3:03', isMe: false },
+                    { id: 5, text: '사진 확대해보세요 이거 기스 맞죠?? 환불해주세요 당장.', time: '오후 3:03', isMe: false },
+                ]
+            },
+            {
+                id: 4,
+                friendId: 4, 
+                lastMessage: '아니 우리집 문이 좁은게 아니라 그쪽 기술이 없는거 아니에요?',
+                lastTime: '오전 11:45',
+                unreadCount: 0,
+                messages: [
+                    { id: 1, text: '고객님 워시타워 설치하러 왔는데 세탁실 문이 너무 좁습니다.', time: '오전 11:30', isMe: true },
+                    { id: 2, text: '그래서요?', time: '오전 11:35', isMe: false },
+                    { id: 3, text: '진입이 불가능해서 사다리차 부르셔야 할 것 같아요.', time: '오전 11:36', isMe: true },
+                    { id: 4, text: '아니 우리집 문이 좁은게 아니라 그쪽 기술이 없는거 아니에요? 그냥 분해해서 넣어줘요!!', time: '오전 11:45', isMe: false },
+                ]
+            }
+        ];
+
+        let activeChatId = null;
+
+        // --- DOM Elements ---
+        const viewList = document.getElementById('view-list');
+        const viewRoom = document.getElementById('view-room');
+        const chatListContainer = document.getElementById('chat-list-container');
+        const totalBadge = document.getElementById('total-badge');
+        
+        const roomTitle = document.getElementById('room-title');
+        const messageArea = document.getElementById('message-area');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const btnSend = document.getElementById('btn-send');
+        const btnBack = document.getElementById('btn-back');
+
+        // --- Functions ---
+
+        // 시간 포맷
+        const getCurrentTime = () => new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+        // 채팅 목록 렌더링
+        function renderChatList() {
+            chatListContainer.innerHTML = '';
+            
+            // 안읽은 메시지 순 정렬 (진상 강조)
+            const sortedChats = [...chatRooms].sort((a, b) => b.unreadCount - a.unreadCount);
+            let totalUnread = 0;
+
+            sortedChats.forEach(room => {
+                const friend = friends.find(f => f.id === room.friendId);
+                totalUnread += room.unreadCount;
+
+                const item = document.createElement('div');
+                item.className = "flex items-center px-4 py-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition-colors";
+                item.onclick = () => openChatRoom(room.id);
+
+                const avatarName = friend.isTeam ? '팀장' : friend.name.slice(0, 2);
+
+                item.innerHTML = `
+                    <div class="w-[48px] h-[48px] rounded-[18px] ${friend.avatar} flex items-center justify-center text-gray-700 text-sm font-bold shadow-sm flex-shrink-0 overflow-hidden">
+                        ${avatarName}
+                    </div>
+                    <div class="ml-3 flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-0.5">
+                            <h3 class="text-[15px] font-bold text-gray-900 truncate flex items-center gap-1">
+                                ${friend.name}
+                            </h3>
+                            <span class="text-[11px] text-gray-400 whitespace-nowrap">${room.lastTime}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-[13px] text-gray-500 truncate w-[80%] leading-tight">
+                                ${room.lastMessage}
+                            </p>
+                            ${room.unreadCount > 0 ? `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">${room.unreadCount}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                chatListContainer.appendChild(item);
+            });
+
+            // 뱃지 업데이트
+            if (totalUnread > 0) {
+                totalBadge.innerText = totalUnread;
+                totalBadge.classList.remove('hidden');
+            } else {
+                totalBadge.classList.add('hidden');
+            }
+        }
+
+        // 채팅방 열기
+        function openChatRoom(roomId) {
+            activeChatId = roomId;
+            const room = chatRooms.find(r => r.id === roomId);
+            const friend = friends.find(f => f.id === room.friendId);
+
+            // 읽음 처리
+            room.unreadCount = 0;
+            renderChatList(); // 목록 갱신 (뱃지 제거용)
+
+            // UI 설정
+            roomTitle.innerText = friend.name;
+            renderMessages(room.messages, friend);
+            
+            // 화면 전환
+            viewRoom.classList.remove('translate-x-full');
+        }
+
+        // 채팅방 닫기
+        function closeChatRoom() {
+            viewRoom.classList.add('translate-x-full');
+            setTimeout(() => {
+                activeChatId = null;
+                messageArea.innerHTML = ''; // Clear to prevent flash on reopen
+            }, 300); // Wait for transition
+        }
+
+        // 메시지 렌더링
+        function renderMessages(messages, friend) {
+            // 기존 날짜 헤더 유지하고 내용만 새로 그리거나, 그냥 전부 다시 그림 (간단하게 전부 리렌더링)
+            const dateHeader = `
+                <div class="flex justify-center mb-4">
+                    <div class="bg-[#9CACBF] text-white text-[10px] px-2 py-1 rounded-full bg-opacity-40">
+                        2025년 5월 24일 금요일
+                    </div>
+                </div>
+            `;
+            messageArea.innerHTML = dateHeader;
+
+            messages.forEach((msg, idx) => {
+                const isMe = msg.isMe;
+                const showProfile = !isMe && (idx === 0 || messages[idx-1].isMe || messages[idx-1].sender !== msg.sender);
+                const showTime = idx === messages.length - 1 || messages[idx+1].time !== msg.time || messages[idx+1].isMe !== isMe;
+                const avatarName = friend.isTeam ? '팀장' : friend.name.slice(0, 2);
+
+                const msgEl = document.createElement('div');
+                msgEl.className = `flex w-full mb-2 ${isMe ? 'justify-end' : 'justify-start'}`;
+                
+                let contentHtml = '';
+
+                // 상대방 프로필
+                if (!isMe) {
+                    contentHtml += `
+                        <div class="w-[38px] h-[38px] rounded-[14px] mr-2 flex-shrink-0 flex items-center justify-center text-xs overflow-hidden ${showProfile ? '' : 'opacity-0'}">
+                            ${showProfile ? `<div class="w-full h-full ${friend.avatar} flex items-center justify-center text-gray-700 font-bold">${avatarName}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                // 말풍선 및 시간
+                contentHtml += `
+                    <div class="flex flex-col max-w-[70%] ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end gap-1.5">
+                            <div class="relative px-3 py-2 text-[14px] leading-relaxed break-all shadow-sm ${isMe ? 'bg-[#FEE500] text-black rounded-l-xl rounded-br-sm rounded-tr-xl' : 'bg-white text-black rounded-r-xl rounded-bl-sm rounded-tl-xl'}">
+                                ${msg.text}
+                            </div>
+                            <div class="flex flex-col gap-0.5 pb-0.5">
+                                ${isMe ? '<span class="text-[10px] text-[#FEE500] font-bold self-end leading-none">1</span>' : ''}
+                                ${showTime ? `<span class="text-[10px] text-[#556677] min-w-max leading-none">${msg.time}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                msgEl.innerHTML = contentHtml;
+                messageArea.appendChild(msgEl);
+            });
+
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        // 메시지 전송 로직
+        function sendMessage(text) {
+            const room = chatRooms.find(r => r.id === activeChatId);
+            if (!room) return;
+
+            const timeString = getCurrentTime();
+            
+            // 내 메시지 추가
+            const newMsg = { id: Date.now(), text, time: timeString, isMe: true };
+            room.messages.push(newMsg);
+            room.lastMessage = text;
+            room.lastTime = timeString;
+
+            // UI 업데이트
+            const friend = friends.find(f => f.id === room.friendId);
+            renderMessages(room.messages, friend);
+            renderChatList(); // 리스트의 마지막 메시지도 갱신
+
+            // 자동 답장 트리거
+            triggerAutoReply(room.id, room.friendId);
+        }
+
+        // 자동 답장 (AI 시뮬레이션)
+        function triggerAutoReply(roomId, friendId) {
+            setTimeout(() => {
+                // 방금 보낸 방이 여전히 존재하는지 확인
+                const room = chatRooms.find(r => r.id === roomId);
+                if (!room) return;
+
+                let replyText = "";
+                
+                // 페르소나별 대사
+                if (friendId === 1) { // 박팀장
+                    const replies = ["김기사 잡담하지 말고 빨리 이동해", "고객 클레임 들어오면 시말서야 알지?", "다음 집 5시까지 도착 가능해?", "사진 찍어서 전송해.", "오늘 야근 좀 해야겠다 물량 밀렸어"];
+                    replyText = replies[Math.floor(Math.random() * replies.length)];
+                } else if (friendId === 2) { // 불광동
+                    const replies = ["저 지금 밖이라니까요? 그냥 문앞에 두세요 책임질게요", "아니 저번 기사님은 창문 떼고 넣어주던데 왜 안해줘요?", "비번 12344321 이에요 그냥 들어가세요", "저 5분 뒤에 도착해요 기다리세요 (30분째 안옴)", "계단 좁아도 세워서 올리면 되잖아요 전문가 아니에요?"];
+                    replyText = replies[Math.floor(Math.random() * replies.length)];
+                } else if (friendId === 3) { // 홍제동
+                    const replies = ["지금 저 가르치시는 거에요?", "아니 맘카페에 다 올릴거에요 환불해주세요", "눈이 있으면 보세요 이게 기스지 뭡니까?", "기분 나빠서 못쓰겠으니까 다시 가져가요", "팀장 바꾸세요 당장."];
+                    replyText = replies[Math.floor(Math.random() * replies.length)];
+                } else if (friendId === 4) { // 은평뉴타운
+                    const replies = ["들어간다니까요?? 우리집 넓어요!", "문짝 떼고 넣으면 들어가잖아요 아 답답하네", "창틀 뜯어주세요 제가 책임질게요", "아니 멀쩡한 세탁기를 왜 못넣는다는 거에요?", "다른 기사님 보내주세요 기술 없으시네"];
+                    replyText = replies[Math.floor(Math.random() * replies.length)];
+                }
+
+                const replyTime = getCurrentTime();
+                room.messages.push({ id: Date.now(), text: replyText, time: replyTime, isMe: false });
+                room.lastMessage = replyText;
+                room.lastTime = replyTime;
+                room.unreadCount = (activeChatId === roomId) ? 0 : room.unreadCount + 1;
+
+                // 현재 채팅방이 열려있으면 즉시 반영
+                if (activeChatId === roomId) {
+                    const friend = friends.find(f => f.id === friendId);
+                    renderMessages(room.messages, friend);
+                }
+                
+                renderChatList();
+
+            }, 1500 + Math.random() * 2000); // 1.5 ~ 3.5초 딜레이
+        }
+
+        // --- Event Listeners ---
+
+        btnBack.addEventListener('click', closeChatRoom);
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text) {
+                sendMessage(text);
+                messageInput.value = '';
+                updateSendButtonState();
+            }
+        });
+
+        // 입력창 상태에 따라 버튼 스타일 변경
+        messageInput.addEventListener('input', updateSendButtonState);
+
+        function updateSendButtonState() {
+            const hasText = messageInput.value.trim().length > 0;
+            if (hasText) {
+                btnSend.classList.remove('bg-gray-100', 'text-gray-400');
+                btnSend.classList.add('bg-[#FEE500]', 'text-black');
+                // 아이콘 교체 (SVG 직접 조작보단 컬러 변경으로 처리됨)
+            } else {
+                btnSend.classList.add('bg-gray-100', 'text-gray-400');
+                btnSend.classList.remove('bg-[#FEE500]', 'text-black');
+            }
+        }
+
+        // --- Initialization ---
+        lucide.createIcons();
+        renderChatList();
+
+    </script>
+</body>
+</html>
