@@ -54,7 +54,7 @@
                         <i data-lucide="key" class="w-[22px] h-[22px] stroke-[1.5]"></i>
                         <span id="api-indicator" class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>
                     </div>
-                    <i data-lucide="settings" class="w-[22px] h-[22px] stroke-[1.5]"></i>
+                    <i id="btn-settings" data-lucide="settings" class="w-[22px] h-[22px] stroke-[1.5] cursor-pointer hover:text-gray-600 transition-colors"></i>
                 </div>
             </div>
 
@@ -150,11 +150,43 @@
             </div>
         </div>
 
+        <!-- API Key Settings Modal -->
+        <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 w-5/6 max-w-sm shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold">설정</h3>
+                    <button id="close-settings" class="text-gray-400 hover:text-black">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">OpenAI API 키</label>
+                    <input 
+                        id="api-key-input" 
+                        type="password" 
+                        placeholder="sk-..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p class="text-xs text-gray-500 mt-2">API 키는 브라우저에만 저장되며, 서버로 전송되지 않습니다.</p>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-save-api" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg transition-colors">
+                        저장
+                    </button>
+                    <button id="btn-cancel-settings" class="flex-1 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 rounded-lg transition-colors">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // OpenAI API 설정 - 여기에 자신의 API 키를 입력하세요
-        const OPENAI_API_KEY = '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'; // 실제 API 키로 교체 필요
+        // OpenAI API 설정 - localStorage에서 불러오기
+        let OPENAI_API_KEY = localStorage.getItem('openai_api_key') || '';
         
         // --- Data ---
         const friends = [
@@ -524,7 +556,7 @@
                         'Authorization': `Bearer ${OPENAI_API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-5-mini',
+                        model: 'gpt-4.1-nano',
                         messages: messages
                     })
                 });
@@ -666,12 +698,44 @@
 
         // --- Initialization ---
         lucide.createIcons();
+        
+        // --- Settings Modal ---
+        const settingsModal = document.getElementById('settings-modal');
+        const btnSettings = document.getElementById('btn-settings');
+        const closeSettings = document.getElementById('close-settings');
+        const btnCancelSettings = document.getElementById('btn-cancel-settings');
+        const btnSaveApi = document.getElementById('btn-save-api');
+        const apiKeyInput = document.getElementById('api-key-input');
+
+        btnSettings.addEventListener('click', () => {
+            apiKeyInput.value = OPENAI_API_KEY;
+            settingsModal.classList.remove('hidden');
+        });
+
+        const closeModal = () => {
+            settingsModal.classList.add('hidden');
+        };
+
+        closeSettings.addEventListener('click', closeModal);
+        btnCancelSettings.addEventListener('click', closeModal);
+
+        btnSaveApi.addEventListener('click', () => {
+            const apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                localStorage.setItem('openai_api_key', apiKey);
+                OPENAI_API_KEY = apiKey;
+                closeModal();
+                checkApiKeyStatus();
+                showErrorMessage('API 키가 저장되었습니다! ✅');
+            } else {
+                showErrorMessage('API 키를 입력해주세요.');
+            }
+        });
+
+        // --- App Startup ---
         renderChatList();
         checkApiKeyStatus();
 
     </script>
 </body>
-
 </html>
-
-
